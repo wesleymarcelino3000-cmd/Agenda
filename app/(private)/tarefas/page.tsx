@@ -1,5 +1,6 @@
 "use client";
 
+import { Suspense } from "react";
 import {
   Check,
   FileSpreadsheet,
@@ -14,6 +15,8 @@ import {
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
+
+export const dynamic = "force-dynamic";
 
 type Category = {
   id: string;
@@ -56,7 +59,7 @@ function priorityLabel(priority?: string | null) {
   return map[value] ?? value;
 }
 
-export default function TarefasPage() {
+function TarefasContent() {
   const searchParams = useSearchParams();
 
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -65,9 +68,13 @@ export default function TarefasPage() {
   const [priority, setPriority] = useState("media");
   const [categoryId, setCategoryId] = useState("");
   const [status, setStatus] = useState("todos");
-  const [query, setQuery] = useState(searchParams.get("busca") ?? "");
+  const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+
+  useEffect(() => {
+    setQuery(searchParams.get("busca") ?? "");
+  }, [searchParams]);
 
   async function loadData() {
     const { data: userData } = await supabase.auth.getUser();
@@ -358,5 +365,13 @@ export default function TarefasPage() {
         </div>
       </div>
     </section>
+  );
+}
+
+export default function TarefasPage() {
+  return (
+    <Suspense fallback={<div className="panel-card">Carregando tarefas...</div>}>
+      <TarefasContent />
+    </Suspense>
   );
 }

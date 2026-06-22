@@ -1,6 +1,8 @@
-Correção das funções de tema e calendário.
+Correção do build da página /tarefas.
 
-Substitua os arquivos no projeto e rode:
+Motivo: useSearchParams precisava estar dentro de Suspense.
+
+Substitua somente app/(private)/tarefas/page.tsx e rode:
 git add .
-git commit -m "Corrigidas funcoes de tema e calendario"
+git commit -m "Corrigido build da pagina tarefas"
 git push origin main
