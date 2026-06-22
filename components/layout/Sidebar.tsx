@@ -1,4 +1,3 @@
-
 "use client";
 
 import Image from "next/image";
@@ -43,7 +42,9 @@ export default function Sidebar() {
         <button className="mobile-menu-button" onClick={() => setOpen(true)} aria-label="Abrir menu">
           <Menu size={22} />
         </button>
-        <strong>Agenda <span style={{ color: "#2563eb" }}>Pro</span></strong>
+        <strong>
+          Agenda <span style={{ color: "#2563eb" }}>Pro</span>
+        </strong>
         <span style={{ width: 44 }} />
       </div>
 
@@ -59,7 +60,9 @@ export default function Sidebar() {
             className="brand-logo"
             priority
           />
-          <h1 className="brand-title">Agenda <span>Pro</span></h1>
+          <h1 className="brand-title">
+            Agenda <span>Pro</span>
+          </h1>
 
           <button
             className="mobile-menu-button"
@@ -75,6 +78,7 @@ export default function Sidebar() {
           {items.map((item) => {
             const Icon = item.icon;
             const active = pathname === item.href || pathname?.startsWith(`${item.href}/`);
+
             return (
               <Link
                 key={item.href}
@@ -97,7 +101,9 @@ export default function Sidebar() {
         <div className="sidebar-card">
           <Image src="/logo-agenda-pro.png" alt="Agenda Pro" width={56} height={56} />
           <div>
-            <strong>Agenda <span>Pro</span></strong>
+            <strong>
+              Agenda <span>Pro</span>
+            </strong>
             <small>Versão 1.0.0</small>
           </div>
         </div>

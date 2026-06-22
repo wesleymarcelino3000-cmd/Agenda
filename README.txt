@@ -1,7 +1,11 @@
-Substitua SOMENTE a pasta app/(auth)/login no projeto.
-Não crie app/login.
+Pacote com:
+- Cadastro visual premium
+- Mensagem 'Usuário criado com sucesso'
+- Sem mensagem de verificar email
+- CSS de login corrigido
+- Menu lateral alinhado
 
-Depois rode:
+Substitua os arquivos no projeto e rode:
 git add .
-git commit -m "Corrigida tela de login auth"
+git commit -m "Cadastro sem verificacao e menu ajustado"
 git push origin main

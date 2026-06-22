@@ -131,11 +131,13 @@ body {
 .login-input input {
   width: 100%;
   height: 58px;
-  border: 0;
-  outline: 0;
-  background: transparent;
+  border: 0 !important;
+  outline: 0 !important;
+  background: transparent !important;
   color: #0f172a;
   font-size: 16px;
+  box-shadow: none !important;
+  padding: 0 !important;
 }
 
 .login-input input::placeholder {
@@ -167,14 +169,41 @@ body {
   font-size: 14px;
 }
 
+.login-success-box {
+  text-align: center;
+  padding: 18px 0 4px;
+  color: #0f172a;
+}
+
+.login-success-box svg {
+  color: #16a34a;
+  margin-bottom: 10px;
+}
+
+.login-success-box h2 {
+  margin: 0;
+  color: #14532d;
+  font-size: 28px;
+  line-height: 1.1;
+  font-weight: 950;
+  letter-spacing: -.04em;
+}
+
+.login-success-box p {
+  margin: 14px 0 22px;
+  color: #475569;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
 .login-submit {
   width: 100%;
   min-height: 64px;
   margin-top: 2px;
   border: 0;
   border-radius: 18px;
-  color: #fff;
-  background: linear-gradient(135deg, #2d8cff, #1d4ed8);
+  color: #fff !important;
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 48%, #1d4ed8 100%);
   font-weight: 950;
   font-size: 18px;
   display: inline-flex;
@@ -183,6 +212,7 @@ body {
   gap: 12px;
   box-shadow: 0 18px 34px rgba(37, 99, 235, .30);
   transition: transform .2s ease, filter .2s ease, box-shadow .2s ease;
+  text-decoration: none !important;
 }
 
 .login-submit:hover:not(:disabled) {
