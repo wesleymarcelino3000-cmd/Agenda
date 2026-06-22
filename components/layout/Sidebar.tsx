@@ -1,108 +1,103 @@
-'use client';
 
-import Image from 'next/image';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+"use client";
+
+import Image from "next/image";
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
+import { useState } from "react";
 import {
-  Bell,
+  LayoutDashboard,
   CalendarDays,
   CheckSquare,
-  LayoutDashboard,
+  Bell,
+  Tags,
+  Settings,
   LogOut,
   Menu,
-  Settings,
-  Tags,
-  X
-} from 'lucide-react';
-import { useState } from 'react';
-import { useAuth } from '@/hooks/useAuth';
+  X,
+} from "lucide-react";
+import { supabase } from "@/lib/supabase";
 
 const items = [
-  ['/dashboard', 'Dashboard', LayoutDashboard],
-  ['/calendario', 'Calendário', CalendarDays],
-  ['/tarefas', 'Tarefas', CheckSquare],
-  ['/lembretes', 'Lembretes', Bell],
-  ['/categorias', 'Categorias', Tags],
-  ['/configuracoes', 'Configurações', Settings]
-] as const;
+  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/calendario", label: "Calendário", icon: CalendarDays },
+  { href: "/tarefas", label: "Tarefas", icon: CheckSquare },
+  { href: "/lembretes", label: "Lembretes", icon: Bell },
+  { href: "/categorias", label: "Categorias", icon: Tags },
+  { href: "/configuracoes", label: "Configurações", icon: Settings },
+];
 
-export function AppShell({ children }: { children: React.ReactNode }) {
+export default function Sidebar() {
+  const pathname = usePathname();
+  const router = useRouter();
   const [open, setOpen] = useState(false);
 
-  return (
-    <div className="layout premium-layout">
-      <button className="mobile-menu floating-mobile-menu" aria-label="Abrir menu" onClick={() => setOpen(true)}>
-        <Menu size={22} />
-      </button>
-      {open && <button className="mobile-overlay" aria-label="Fechar menu" onClick={() => setOpen(false)} />}
-      <Side open={open} close={() => setOpen(false)} />
-      <main className="main premium-main">{children}</main>
-      <MobileBottomNav />
-    </div>
-  );
-}
-
-function Side({ open, close }: { open: boolean; close: () => void }) {
-  const path = usePathname();
-  const { signOut } = useAuth();
+  async function handleLogout() {
+    await supabase.auth.signOut();
+    router.replace("/login");
+  }
 
   return (
-    <aside className={`sidebar premium-sidebar ${open ? 'open' : ''}`}>
-      <button className="sidebar-close" aria-label="Fechar menu" onClick={close}>
-        <X size={20} />
-      </button>
-
-      <Link href="/dashboard" className="premium-brand" onClick={close}>
-        <span className="premium-brand-mark">
-          <Image src="/logo-agenda-pro.png" alt="Agenda Pro" width={52} height={52} priority />
-        </span>
-        <span className="premium-brand-text">
-          <strong>Agenda <b>Pro</b></strong>
-          <small>Organize. Planeje. Realize.</small>
-        </span>
-      </Link>
-
-      <nav className="nav premium-nav">
-        {items.map(([href, label, Icon]) => (
-          <Link key={href} className={path.startsWith(href) ? 'active' : ''} href={href} onClick={close}>
-            <Icon size={21} />
-            <span>{label}</span>
-          </Link>
-        ))}
-        <button onClick={signOut}>
-          <LogOut size={21} />
-          <span>Sair</span>
+    <>
+      <div className="mobile-topbar">
+        <button className="mobile-menu-button" onClick={() => setOpen(true)} aria-label="Abrir menu">
+          <Menu size={22} />
         </button>
-      </nav>
-
-      <div className="sidebar-version-card">
-        <Image src="/logo-agenda-pro.png" alt="Agenda Pro" width={56} height={56} />
-        <div>
-          <strong>Agenda <b>Pro</b></strong>
-          <span>Versão 1.0.0</span>
-        </div>
+        <strong>Agenda <span style={{ color: "#2563eb" }}>Pro</span></strong>
+        <span style={{ width: 44 }} />
       </div>
-    </aside>
-  );
-}
 
-function MobileBottomNav() {
-  const path = usePathname();
-  const { signOut } = useAuth();
-  const mobileItems = items.slice(0, 5);
+      {open && <div className="mobile-backdrop" onClick={() => setOpen(false)} />}
 
-  return (
-    <nav className="mobile-bottom-nav" aria-label="Menu mobile">
-      {mobileItems.map(([href, label, Icon]) => (
-        <Link key={href} className={path.startsWith(href) ? 'active' : ''} href={href}>
-          <Icon size={20} />
-          <span>{label.split(' ')[0]}</span>
-        </Link>
-      ))}
-      <button onClick={signOut} aria-label="Sair">
-        <LogOut size={20} />
-        <span>Sair</span>
-      </button>
-    </nav>
+      <aside className={`sidebar ${open ? "open" : ""}`}>
+        <div className="brand">
+          <Image
+            src="/logo-agenda-pro.png"
+            alt="Agenda Pro"
+            width={48}
+            height={48}
+            className="brand-logo"
+            priority
+          />
+          <div>
+            <h1 className="brand-title">Agenda <span>Pro</span></h1>
+          </div>
+          <button
+            className="mobile-menu-button"
+            style={{ marginLeft: "auto" }}
+            onClick={() => setOpen(false)}
+            aria-label="Fechar menu"
+          >
+            <X size={20} />
+          </button>
+        </div>
+
+        <nav className="sidebar-nav">
+          {items.map((item) => {
+            const Icon = item.icon;
+            const active = pathname === item.href || pathname?.startsWith(`${item.href}/`);
+
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                onClick={() => setOpen(false)}
+                className={`nav-link ${active ? "active" : ""}`}
+              >
+                <Icon />
+                <span>{item.label}</span>
+              </Link>
+            );
+          })}
+
+          <button className="logout-button" onClick={handleLogout}>
+            <LogOut />
+            <span>Sair</span>
+          </button>
+        </nav>
+
+        <div className="sidebar-wave" />
+      </aside>
+    </>
   );
 }

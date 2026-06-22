@@ -1,119 +1,155 @@
-'use client';
 
-import { useSupabaseTable } from '@/hooks/useSupabaseTable';
-import type { EventItem, Reminder, Task } from '@/types/database';
+"use client";
+
 import {
-  BarChart3,
   Bell,
   CalendarDays,
   CheckCircle2,
   CheckSquare,
   Clock3,
-  ChevronRight,
-  Moon,
+  MoreVertical,
   Search,
-  UserCircle
-} from 'lucide-react';
-import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
+  Moon,
+  BarChart3,
+} from "lucide-react";
+import { useEffect, useState } from "react";
+import { supabase } from "@/lib/supabase";
 
-export default function Page() {
-  const tasks = useSupabaseTable<Task>('tasks');
-  const events = useSupabaseTable<EventItem>('events');
-  const reminders = useSupabaseTable<Reminder>('reminders');
+export default function DashboardPage() {
+  const [stats, setStats] = useState({
+    tasks: 0,
+    completed: 0,
+    late: 0,
+    reminders: 0,
+  });
 
-  const today = new Date().toISOString().slice(0, 10);
-  const done = tasks.rows.filter((t) => t.status === 'concluida').length;
-  const pending = tasks.rows.filter((t) => t.status === 'pendente').length;
-  const inProgress = tasks.rows.filter((t) => t.status === 'em_andamento').length;
-  const overdue = tasks.rows.filter((t) => t.due_date && t.due_date < today && t.status !== 'concluida').length;
-  const unreadReminders = reminders.rows.filter((r) => !r.is_read).length;
+  useEffect(() => {
+    async function load() {
+      const { data: userData } = await supabase.auth.getUser();
+      const userId = userData.user?.id;
+      if (!userId) return;
 
-  const data = [
-    { name: 'Pendentes', valor: pending },
-    { name: 'Andamento', valor: inProgress },
-    { name: 'Concluídas', valor: done },
-    { name: 'Atrasadas', valor: overdue }
-  ];
+      const [{ data: tasks }, { data: reminders }] = await Promise.all([
+        supabase.from("tasks").select("*").eq("user_id", userId),
+        supabase.from("reminders").select("*").eq("user_id", userId),
+      ]);
+
+      const today = new Date().toISOString().slice(0, 10);
+      setStats({
+        tasks: tasks?.filter((t) => t.status !== "concluida").length ?? 0,
+        completed: tasks?.filter((t) => t.status === "concluida").length ?? 0,
+        late: tasks?.filter((t) => t.due_date && t.due_date < today && t.status !== "concluida").length ?? 0,
+        reminders: reminders?.filter((r) => !r.is_read).length ?? 0,
+      });
+    }
+
+    load();
+  }, []);
 
   return (
-    <div className="dashboard-premium">
-      <header className="dashboard-header">
+    <section>
+      <div className="dashboard-top">
         <div>
-          <h1>Dashboard</h1>
-          <p>Resumo do dia, tarefas, eventos, lembretes e produtividade.</p>
-        </div>
-        <div className="dashboard-actions">
-          <button aria-label="Buscar"><Search size={22} /></button>
-          <button aria-label="Notificações" className="has-dot"><Bell size={22} /></button>
-          <button aria-label="Tema"><Moon size={22} /></button>
-          <button className="user-chip" aria-label="Usuário"><span>W</span><b>Wesley</b><UserCircle size={20} /></button>
-        </div>
-      </header>
-
-      <section className="premium-stat-grid">
-        <StatCard icon={<CheckSquare />} label="Tarefas" value={tasks.rows.length} sub="Pendentes" color="blue" />
-        <StatCard icon={<CheckCircle2 />} label="Concluídas" value={done} sub="Hoje" color="green" />
-        <StatCard icon={<Clock3 />} label="Atrasadas" value={overdue} sub="Atrasadas" color="orange" />
-        <StatCard icon={<Bell />} label="Lembretes" value={unreadReminders} sub="Próximos" color="purple" />
-      </section>
-
-      <section className="dashboard-content-grid">
-        <div className="premium-panel chart-panel">
-          <div className="panel-title-row">
-            <div className="panel-title">
-              <span className="panel-icon blue"><BarChart3 size={24} /></span>
-              <h2>Produtividade semanal</h2>
-            </div>
-            <button className="week-filter"><CalendarDays size={18} /> Esta semana</button>
-          </div>
-          <div className="premium-chart-wrap">
-            <ResponsiveContainer>
-              <BarChart data={data}>
-                <XAxis dataKey="name" />
-                <YAxis allowDecimals={false} />
-                <Tooltip />
-                <Bar dataKey="valor" radius={[10, 10, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
+          <h1 className="page-title">Dashboard</h1>
+          <p className="page-description">
+            Resumo do dia, tarefas, eventos, lembretes e produtividade.
+          </p>
         </div>
 
-        <div className="premium-panel today-panel">
-          <div className="panel-title-row">
-            <div className="panel-title">
-              <span className="panel-icon blue"><CalendarDays size={24} /></span>
-              <h2>Hoje</h2>
-            </div>
-          </div>
-          <TodayRow icon={<CheckSquare />} label="Tarefas do dia" value={tasks.rows.filter((t) => t.due_date === today).length} color="blue" />
-          <TodayRow icon={<CalendarDays />} label="Eventos da semana" value={events.rows.length} color="green" />
-          <TodayRow icon={<Bell />} label="Lembretes próximos" value={reminders.rows.length} color="purple" />
+        <div className="top-actions">
+          <button className="icon-button" aria-label="Pesquisar"><Search size={21} /></button>
+          <button className="icon-button" aria-label="Notificações"><Bell size={21} /></button>
+          <button className="icon-button" aria-label="Tema"><Moon size={21} /></button>
+          <button className="user-pill"><span className="avatar">W</span> Wesley</button>
         </div>
-      </section>
-    </div>
-  );
-}
-
-function StatCard({ icon, label, value, sub, color }: { icon: React.ReactNode; label: string; value: number; sub: string; color: 'blue' | 'green' | 'orange' | 'purple' }) {
-  return (
-    <article className={`premium-stat-card ${color}`}>
-      <span className="stat-icon">{icon}</span>
-      <div>
-        <h3>{label}</h3>
-        <strong>{value}</strong>
-        <small>{sub}</small>
       </div>
-    </article>
-  );
-}
 
-function TodayRow({ icon, label, value, color }: { icon: React.ReactNode; label: string; value: number; color: 'blue' | 'green' | 'purple' }) {
-  return (
-    <div className={`today-row ${color}`}>
-      <span>{icon}</span>
-      <b>{label}</b>
-      <strong>{value}</strong>
-      <ChevronRight size={20} />
-    </div>
+      <div className="stats-grid">
+        <div className="stat-card" style={{ "--accent": "#2563eb", "--icon-bg": "#dbeafe" } as React.CSSProperties}>
+          <div className="stat-icon"><CheckSquare /></div>
+          <div>
+            <div className="stat-label">Tarefas</div>
+            <div className="stat-value">{stats.tasks}</div>
+            <div className="stat-sub">Pendentes</div>
+          </div>
+        </div>
+
+        <div className="stat-card" style={{ "--accent": "#16a34a", "--icon-bg": "#dcfce7" } as React.CSSProperties}>
+          <div className="stat-icon"><CheckCircle2 /></div>
+          <div>
+            <div className="stat-label">Concluídas</div>
+            <div className="stat-value">{stats.completed}</div>
+            <div className="stat-sub">Hoje</div>
+          </div>
+        </div>
+
+        <div className="stat-card" style={{ "--accent": "#f59e0b", "--icon-bg": "#ffedd5" } as React.CSSProperties}>
+          <div className="stat-icon"><Clock3 /></div>
+          <div>
+            <div className="stat-label">Atrasadas</div>
+            <div className="stat-value">{stats.late}</div>
+            <div className="stat-sub">Atrasadas</div>
+          </div>
+        </div>
+
+        <div className="stat-card" style={{ "--accent": "#7c3aed", "--icon-bg": "#f3e8ff" } as React.CSSProperties}>
+          <div className="stat-icon"><Bell /></div>
+          <div>
+            <div className="stat-label">Lembretes</div>
+            <div className="stat-value">{stats.reminders}</div>
+            <div className="stat-sub">Próximos</div>
+          </div>
+        </div>
+      </div>
+
+      <div className="dashboard-grid">
+        <div className="content-card">
+          <div className="card-header">
+            <h2 className="card-title">
+              <span className="card-title-icon"><BarChart3 /></span>
+              Produtividade semanal
+            </h2>
+            <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+              <select className="week-select" defaultValue="semana">
+                <option value="semana">Esta semana</option>
+                <option value="mes">Este mês</option>
+              </select>
+              <MoreVertical size={21} color="#64748b" />
+            </div>
+          </div>
+          <div className="fake-chart"></div>
+          <div className="chart-labels">
+            <span>Pendentes</span>
+            <span>Andamento</span>
+            <span>Concluídas</span>
+            <span>Atrasadas</span>
+          </div>
+        </div>
+
+        <div className="content-card">
+          <div className="card-header">
+            <h2 className="card-title">
+              <span className="card-title-icon"><CalendarDays /></span>
+              Hoje
+            </h2>
+          </div>
+
+          <div className="today-list">
+            <div className="today-item">
+              <div className="today-left"><CheckSquare color="#2563eb" /> Tarefas do dia</div>
+              <strong style={{ color: "#2563eb" }}>{stats.tasks}</strong>
+            </div>
+            <div className="today-item">
+              <div className="today-left"><CalendarDays color="#16a34a" /> Eventos da semana</div>
+              <strong style={{ color: "#16a34a" }}>0</strong>
+            </div>
+            <div className="today-item">
+              <div className="today-left"><Bell color="#7c3aed" /> Lembretes próximos</div>
+              <strong style={{ color: "#7c3aed" }}>{stats.reminders}</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
   );
 }
