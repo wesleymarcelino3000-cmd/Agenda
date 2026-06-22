@@ -1,4 +1,5 @@
 import "../tema-calendario-fix.css";
+import "../tarefas-categorias-status.css";
 import Sidebar from "@/components/layout/Sidebar";
 
 export default function PrivateLayout({ children }: { children: React.ReactNode }) {
