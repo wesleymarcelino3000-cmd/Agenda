@@ -1,2 +1,5 @@
-import { SimpleCrud } from '@/components/features/SimpleCrud';
-export default function Page(){return <SimpleCrud kind="events" title="Calendário"/>}
+import { CalendarPlanner } from '@/components/features/CalendarPlanner';
+
+export default function Page() {
+  return <CalendarPlanner />;
+}

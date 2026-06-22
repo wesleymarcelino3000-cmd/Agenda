@@ -1,14 +1,18 @@
-Correção do login voltando para /login na Vercel.
+Atualização da página Calendário.
 
-Copie estes arquivos para a raiz do projeto agenda-profissional/agenda-profissional e substitua os existentes:
+Como aplicar:
+1. Extraia este ZIP dentro da raiz do projeto agenda-profissional/agenda-profissional.
+2. Quando pedir, clique em Substituir arquivos no destino.
+3. Rode no PowerShell:
+   git add .
+   git commit -m "Calendario com selecao de dia e lembretes"
+   git push origin main
 
-middleware.ts
-components/layout/Sidebar.tsx
-
-Depois rode:
-
-git add .
-git commit -m "Corrigido redirecionamento de login"
-git push origin main
-
-A Vercel fará o deploy automático.
+O que foi adicionado:
+- Calendário mensal clicável.
+- Seleção de dia.
+- Criar Evento, Tarefa ou Lembrete no dia selecionado.
+- Listagem dos itens do dia.
+- Marcar como concluído/lido.
+- Excluir item.
+- Busca no dia selecionado.
