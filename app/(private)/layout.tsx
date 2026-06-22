@@ -1,4 +1,4 @@
-
+import "../dashboard-user-fix.css";
 import Sidebar from "@/components/layout/Sidebar";
 
 export default function PrivateLayout({ children }: { children: React.ReactNode }) {
