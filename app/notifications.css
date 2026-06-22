@@ -1,0 +1,114 @@
+.notification-permission-card {
+  position: fixed;
+  right: 22px;
+  bottom: 22px;
+  z-index: 9999;
+  width: min(420px, calc(100vw - 32px));
+  border-radius: 22px;
+  padding: 18px;
+  background: rgba(255, 255, 255, .97);
+  border: 1px solid rgba(203, 213, 225, .9);
+  box-shadow: 0 24px 70px rgba(15, 23, 42, .22);
+  display: grid;
+  grid-template-columns: 50px 1fr auto;
+  gap: 14px;
+  align-items: center;
+  animation: notificationIn .35s ease both;
+}
+
+@keyframes notificationIn {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.notification-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 28px;
+  height: 28px;
+  border: 0;
+  border-radius: 10px;
+  background: #f1f5f9;
+  color: #64748b;
+  display: grid;
+  place-items: center;
+}
+
+.notification-icon {
+  width: 50px;
+  height: 50px;
+  border-radius: 16px;
+  background: #dbeafe;
+  color: #2563eb;
+  display: grid;
+  place-items: center;
+}
+
+.notification-permission-card strong {
+  color: #0f172a;
+  font-size: 16px;
+  font-weight: 950;
+}
+
+.notification-permission-card p {
+  margin: 4px 0 0;
+  color: #64748b;
+  font-size: 14px;
+  line-height: 1.35;
+}
+
+.notification-enable {
+  min-height: 42px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  color: white;
+  font-weight: 900;
+  box-shadow: 0 12px 24px rgba(37, 99, 235, .24);
+}
+
+.notification-enable:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.04);
+}
+
+html.theme-dark .notification-permission-card {
+  background: rgba(15, 23, 42, .98);
+  border-color: rgba(148, 163, 184, .25);
+}
+
+html.theme-dark .notification-permission-card strong {
+  color: #f8fafc;
+}
+
+html.theme-dark .notification-permission-card p {
+  color: #94a3b8;
+}
+
+html.theme-dark .notification-close {
+  background: rgba(30, 41, 59, .95);
+  color: #cbd5e1;
+}
+
+@media (max-width: 520px) {
+  .notification-permission-card {
+    left: 16px;
+    right: 16px;
+    bottom: 16px;
+    grid-template-columns: 44px 1fr;
+  }
+
+  .notification-enable {
+    grid-column: 1 / -1;
+    width: 100%;
+  }
+}
