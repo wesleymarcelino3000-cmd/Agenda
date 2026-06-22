@@ -1,18 +1,13 @@
-Atualização da página Calendário.
+Correção da tela de Tarefas:
+- Selects mais visíveis no tema escuro
+- Botões com animação hover
+- Lista de tarefas mais moderna
+- Ao concluir, a tarefa fica riscada
+- Botão Concluir vira Reabrir quando a tarefa está concluída
 
-Como aplicar:
-1. Extraia este ZIP dentro da raiz do projeto agenda-profissional/agenda-profissional.
-2. Quando pedir, clique em Substituir arquivos no destino.
-3. Rode no PowerShell:
-   git add .
-   git commit -m "Calendario com selecao de dia e lembretes"
-   git push origin main
+Copie as pastas components e app para a raiz do projeto, substituindo os arquivos quando perguntar.
+Depois rode:
 
-O que foi adicionado:
-- Calendário mensal clicável.
-- Seleção de dia.
-- Criar Evento, Tarefa ou Lembrete no dia selecionado.
-- Listagem dos itens do dia.
-- Marcar como concluído/lido.
-- Excluir item.
-- Busca no dia selecionado.
+git add .
+git commit -m "Melhorias visuais nas tarefas"
+git push origin main
