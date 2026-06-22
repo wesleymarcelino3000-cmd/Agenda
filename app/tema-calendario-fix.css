@@ -1,0 +1,42 @@
+
+html.theme-dark, html.theme-dark body { background:#07111f!important; color:#e5edf9!important; }
+html.theme-dark .app-shell { background:linear-gradient(135deg,#08111f 0%,#0f172a 100%)!important; }
+html.theme-dark .sidebar, html.theme-dark .content-card, html.theme-dark .form-card,
+html.theme-dark .panel-card, html.theme-dark .stat-card, html.theme-dark .today-item,
+html.theme-dark .calendar-day, html.theme-dark .calendar-grid, html.theme-dark .profile-dropdown {
+  background:rgba(15,23,42,.96)!important; border-color:rgba(148,163,184,.22)!important; color:#e5edf9!important;
+}
+html.theme-dark .page-title, html.theme-dark .card-title, html.theme-dark .calendar-title,
+html.theme-dark .selected-day-title, html.theme-dark .brand-title, html.theme-dark .stat-value,
+html.theme-dark .stat-label, html.theme-dark .today-left { color:#f8fafc!important; }
+html.theme-dark .page-description, html.theme-dark .stat-sub, html.theme-dark .selected-day-sub, html.theme-dark small { color:#94a3b8!important; }
+html.theme-dark .icon-button, html.theme-dark .user-pill, html.theme-dark .soft-button,
+html.theme-dark .week-select, html.theme-dark input, html.theme-dark textarea, html.theme-dark select {
+  background:rgba(30,41,59,.95)!important; color:#e5edf9!important; border-color:rgba(148,163,184,.28)!important;
+}
+html.theme-dark .calendar-weekday { background:rgba(30,41,59,.95)!important; color:#cbd5e1!important; }
+html.theme-dark .calendar-day.muted { background:rgba(15,23,42,.72)!important; color:#64748b!important; }
+html.theme-dark .calendar-day:hover, html.theme-dark .calendar-day.selected { background:rgba(30,64,175,.18)!important; }
+html.theme-dark .nav-link { color:#cbd5e1!important; }
+html.theme-dark .nav-link.active, html.theme-dark .nav-link:hover { color:#60a5fa!important; background:rgba(37,99,235,.18)!important; }
+
+.dashboard-actions { position:relative; }
+.dashboard-search { min-height:48px; min-width:min(360px,42vw); border:1px solid var(--border); border-radius:16px; background:rgba(255,255,255,.96); display:flex; align-items:center; gap:10px; padding:0 12px; box-shadow:0 12px 28px rgba(15,23,42,.08); }
+.dashboard-search input { border:0!important; outline:0!important; background:transparent!important; min-height:40px!important; padding:0!important; box-shadow:none!important; }
+.dashboard-search button { width:32px; height:32px; border:0; border-radius:10px; background:#eef5ff; display:grid; place-items:center; }
+.dashboard-bell { position:relative; }
+.dashboard-bell span { position:absolute; top:-5px; right:-5px; min-width:20px; height:20px; padding:0 6px; border-radius:999px; background:#ef4444; color:white; font-size:12px; font-weight:900; display:grid; place-items:center; border:2px solid white; }
+.profile-menu-wrap { position:relative; }
+.profile-dropdown { position:absolute; top:calc(100% + 10px); right:0; width:260px; padding:10px; border-radius:18px; border:1px solid var(--border); background:white; box-shadow:0 24px 60px rgba(15,23,42,.18); z-index:50; }
+.profile-dropdown-header { padding:12px; border-bottom:1px solid var(--border); margin-bottom:8px; }
+.profile-dropdown-header strong { display:block; font-size:16px; }
+.profile-dropdown-header small { display:block; margin-top:4px; color:#64748b; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.profile-dropdown button { width:100%; min-height:44px; border:0; border-radius:13px; padding:0 12px; background:transparent; color:#0f172a; display:flex; align-items:center; gap:10px; font-weight:800; text-align:left; }
+.profile-dropdown button:hover { background:#eef5ff; color:#2563eb; }
+.profile-dropdown button.danger { color:#dc2626; }
+.today-item { cursor:pointer; transition:transform .2s ease, box-shadow .2s ease; }
+.today-item:hover { transform:translateY(-2px); box-shadow:0 14px 28px rgba(15,23,42,.08); }
+.calendar-day { cursor:pointer; }
+.calendar-toast { margin-top:14px; padding:12px 14px; border-radius:14px; background:#dcfce7; color:#14532d; font-weight:850; }
+.calendar-error { margin-top:14px; padding:12px 14px; border-radius:14px; background:#fef2f2; color:#b91c1c; font-weight:850; }
+@media (max-width:760px){ .dashboard-search{order:10;width:100%;min-width:100%;}.dashboard-actions{flex-wrap:wrap}.profile-dropdown{right:0;width:min(280px,82vw)} }

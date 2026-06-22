@@ -1,6 +1,6 @@
-Atualiza o Dashboard para mostrar o nome real do usuário logado e adiciona funções aos botões do topo.
+Correção das funções de tema e calendário.
 
 Substitua os arquivos no projeto e rode:
 git add .
-git commit -m "Dashboard com usuario logado e funcoes"
+git commit -m "Corrigidas funcoes de tema e calendario"
 git push origin main
