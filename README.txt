@@ -1,6 +1,7 @@
-Substitua somente a pasta app/login no projeto.
+Substitua SOMENTE a pasta app/(auth)/login no projeto.
+Não crie app/login.
 
 Depois rode:
 git add .
-git commit -m "Restaurada tela de login"
+git commit -m "Corrigida tela de login auth"
 git push origin main
