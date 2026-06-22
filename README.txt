@@ -1,8 +1,6 @@
-Pacote de refino final da interface Agenda Pro.
-
-Substitua os arquivos na raiz do projeto.
+Substitua somente a pasta app/login no projeto.
 
 Depois rode:
 git add .
-git commit -m "Refino final da interface e calendario"
+git commit -m "Restaurada tela de login"
 git push origin main
