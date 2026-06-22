@@ -59,9 +59,8 @@ export default function Sidebar() {
             className="brand-logo"
             priority
           />
-          <div>
-            <h1 className="brand-title">Agenda <span>Pro</span></h1>
-          </div>
+          <h1 className="brand-title">Agenda <span>Pro</span></h1>
+
           <button
             className="mobile-menu-button"
             style={{ marginLeft: "auto" }}
@@ -76,7 +75,6 @@ export default function Sidebar() {
           {items.map((item) => {
             const Icon = item.icon;
             const active = pathname === item.href || pathname?.startsWith(`${item.href}/`);
-
             return (
               <Link
                 key={item.href}
@@ -96,7 +94,13 @@ export default function Sidebar() {
           </button>
         </nav>
 
-        <div className="sidebar-wave" />
+        <div className="sidebar-card">
+          <Image src="/logo-agenda-pro.png" alt="Agenda Pro" width={56} height={56} />
+          <div>
+            <strong>Agenda <span>Pro</span></strong>
+            <small>Versão 1.0.0</small>
+          </div>
+        </div>
       </aside>
     </>
   );

@@ -1,3 +1,50 @@
-'use client';
-import { FormEvent, useState } from 'react';import { supabase } from '@/lib/supabase';import { useAuth } from '@/hooks/useAuth';
-export default function Page(){const {user}=useAuth();const [name,setName]=useState(user?.user_metadata?.name??'');const [email,setEmail]=useState(user?.email??'');const [password,setPassword]=useState('');const [msg,setMsg]=useState('');async function save(e:FormEvent){e.preventDefault();setMsg('');const {error}=await supabase.auth.updateUser({email,password:password||undefined,data:{name}});setMsg(error?error.message:'Configurações salvas com sucesso.')}return <div><h1>Configurações</h1><form className="card" onSubmit={save}><div className="field"><label>Nome</label><input className="input" value={name} onChange={e=>setName(e.target.value)}/></div><div className="field"><label>E-mail</label><input className="input" type="email" value={email} onChange={e=>setEmail(e.target.value)}/></div><div className="field"><label>Nova senha</label><input className="input" type="password" value={password} onChange={e=>setPassword(e.target.value)} placeholder="Deixe vazio para manter"/></div><div className="field"><label>Tema</label><select className="select" onChange={e=>document.documentElement.className=e.target.value}><option value="">Claro</option><option value="dark">Escuro</option></select></div><button className="btn">Salvar</button>{msg&&<p className="muted">{msg}</p>}</form></div>}
+
+"use client";
+
+import { Save, Settings } from "lucide-react";
+import { useEffect, useState } from "react";
+import { supabase } from "@/lib/supabase";
+
+export default function ConfiguracoesPage() {
+  const [name, setName] = useState("");
+  const [theme, setTheme] = useState("light");
+
+  useEffect(() => {
+    async function load() {
+      const { data: userData } = await supabase.auth.getUser();
+      const userId = userData.user?.id;
+      if (!userId) return;
+      const { data } = await supabase.from("profiles").select("*").eq("id", userId).single();
+      setName(data?.name ?? "");
+    }
+    load();
+  }, []);
+
+  async function save() {
+    const { data: userData } = await supabase.auth.getUser();
+    const userId = userData.user?.id;
+    if (!userId) return;
+    await supabase.from("profiles").update({ name }).eq("id", userId);
+    alert("Configurações salvas.");
+  }
+
+  return (
+    <section>
+      <div className="page-top">
+        <div>
+          <h1 className="page-title">Configurações</h1>
+          <p className="page-description">Preferências da conta e aparência do sistema.</p>
+        </div>
+      </div>
+
+      <div className="form-card">
+        <div className="card-header"><h2 className="card-title"><span className="card-title-icon"><Settings /></span>Minha conta</h2></div>
+        <div className="form-grid">
+          <div className="field"><label>Nome</label><input value={name} onChange={(e) => setName(e.target.value)} placeholder="Seu nome" /></div>
+          <div className="field"><label>Tema</label><select value={theme} onChange={(e) => setTheme(e.target.value)}><option value="light">Claro</option><option value="dark">Escuro</option></select></div>
+        </div>
+        <button className="primary-button" onClick={save} style={{ marginTop: 16 }}><Save size={18} /> Salvar configurações</button>
+      </div>
+    </section>
+  );
+}
