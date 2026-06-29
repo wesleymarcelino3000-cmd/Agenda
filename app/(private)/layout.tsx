@@ -1,5 +1,5 @@
 import "../tema-calendario-fix.css";
-import "../tarefas-categorias-status.css";
+import "../tarefas-categoria-prioridade.css";
 import "../notifications.css";
 import Sidebar from "@/components/layout/Sidebar";
 import NotificationProvider from "@/components/notifications/NotificationProvider";

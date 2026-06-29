@@ -1,38 +1,14 @@
 "use client";
 
-import { Suspense } from "react";
-import {
-  Check,
-  FileSpreadsheet,
-  FileText,
-  Plus,
-  RotateCcw,
-  Search,
-  Trash2,
-  Tag,
-  CircleDot,
-} from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
+import { Check, CircleDot, FileSpreadsheet, FileText, Layers, Plus, RotateCcw, Search, Tag, Trash2 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
 export const dynamic = "force-dynamic";
 
-type Category = {
-  id: string;
-  name: string;
-  color: string;
-};
-
-type Task = {
-  id: string;
-  title: string;
-  priority: string | null;
-  status: string | null;
-  category_id?: string | null;
-  due_date?: string | null;
-  created_at?: string;
-};
+type Category = { id: string; name: string; color: string };
+type Task = { id: string; title: string; priority: string | null; status: string | null; category_id?: string | null; created_at?: string };
 
 const statusOptions = [
   { value: "pendente", label: "Pendente", color: "#f59e0b", bg: "#fff7ed" },
@@ -42,21 +18,19 @@ const statusOptions = [
   { value: "cancelada", label: "Cancelada", color: "#64748b", bg: "#f8fafc" },
 ];
 
-function getStatusConfig(status?: string | null) {
+const priorityOptions = [
+  { value: "urgente", label: "Urgente", weight: 4, color: "#dc2626" },
+  { value: "alta", label: "Alta", weight: 3, color: "#f97316" },
+  { value: "media", label: "Média", weight: 2, color: "#2563eb" },
+  { value: "baixa", label: "Baixa", weight: 1, color: "#16a34a" },
+];
+
+function getStatus(status?: string | null) {
   return statusOptions.find((item) => item.value === status) ?? statusOptions[0];
 }
 
-function priorityLabel(priority?: string | null) {
-  const value = priority || "media";
-
-  const map: Record<string, string> = {
-    baixa: "Baixa",
-    media: "Média",
-    alta: "Alta",
-    urgente: "Urgente",
-  };
-
-  return map[value] ?? value;
+function getPriority(priority?: string | null) {
+  return priorityOptions.find((item) => item.value === priority) ?? priorityOptions[2];
 }
 
 function TarefasContent() {
@@ -68,6 +42,7 @@ function TarefasContent() {
   const [priority, setPriority] = useState("media");
   const [categoryId, setCategoryId] = useState("");
   const [status, setStatus] = useState("todos");
+  const [selectedCategory, setSelectedCategory] = useState("todas");
   const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
@@ -79,21 +54,11 @@ function TarefasContent() {
   async function loadData() {
     const { data: userData } = await supabase.auth.getUser();
     const userId = userData.user?.id;
-
     if (!userId) return;
 
     const [{ data: taskData }, { data: categoryData }] = await Promise.all([
-      supabase
-        .from("tasks")
-        .select("*")
-        .eq("user_id", userId)
-        .order("created_at", { ascending: false }),
-
-      supabase
-        .from("categories")
-        .select("id,name,color")
-        .eq("user_id", userId)
-        .order("name", { ascending: true }),
+      supabase.from("tasks").select("*").eq("user_id", userId).order("created_at", { ascending: false }),
+      supabase.from("categories").select("id,name,color").eq("user_id", userId).order("name", { ascending: true }),
     ]);
 
     setTasks(taskData ?? []);
@@ -130,12 +95,9 @@ function TarefasContent() {
       status: "pendente",
     };
 
-    if (categoryId) {
-      payload.category_id = categoryId;
-    }
+    if (categoryId) payload.category_id = categoryId;
 
     const { error } = await supabase.from("tasks").insert(payload);
-
     setLoading(false);
 
     if (error) {
@@ -148,20 +110,16 @@ function TarefasContent() {
     setCategoryId("");
     setMessage("Tarefa criada com sucesso.");
     await loadData();
-
     setTimeout(() => setMessage(""), 2500);
   }
 
-  async function updateTaskStatus(taskId: string, newStatus: string) {
-    await supabase.from("tasks").update({ status: newStatus }).eq("id", taskId);
+  async function updateTask(taskId: string, changes: Record<string, any>) {
+    await supabase.from("tasks").update(changes).eq("id", taskId);
     await loadData();
   }
 
   async function toggleTask(task: Task) {
-    await updateTaskStatus(
-      task.id,
-      task.status === "concluida" ? "pendente" : "concluida"
-    );
+    await updateTask(task.id, { status: task.status === "concluida" ? "pendente" : "concluida" });
   }
 
   async function removeTask(id: string) {
@@ -173,30 +131,78 @@ function TarefasContent() {
     return categories.find((category) => category.id === categoryId);
   }
 
+  function categoryCount(categoryId: string) {
+    return tasks.filter((task) => task.category_id === categoryId && task.status !== "concluida").length;
+  }
+
   const filtered = useMemo(() => {
-    return tasks.filter((task) => {
-      const matchesStatus = status === "todos" || task.status === status;
-      const matchesQuery = task.title?.toLowerCase().includes(query.toLowerCase());
-      return matchesStatus && matchesQuery;
-    });
-  }, [tasks, status, query]);
+    return tasks
+      .filter((task) => {
+        const matchesStatus = status === "todos" || task.status === status;
+        const matchesCategory =
+          selectedCategory === "todas" ||
+          (selectedCategory === "sem_categoria" && !task.category_id) ||
+          task.category_id === selectedCategory;
+        const matchesQuery = task.title?.toLowerCase().includes(query.toLowerCase());
+        return matchesStatus && matchesCategory && matchesQuery;
+      })
+      .sort((a, b) => {
+        const priorityA = getPriority(a.priority).weight;
+        const priorityB = getPriority(b.priority).weight;
+        if (priorityB !== priorityA) return priorityB - priorityA;
+
+        const doneA = a.status === "concluida" ? 1 : 0;
+        const doneB = b.status === "concluida" ? 1 : 0;
+        if (doneA !== doneB) return doneA - doneB;
+
+        return new Date(b.created_at ?? "").getTime() - new Date(a.created_at ?? "").getTime();
+      });
+  }, [tasks, status, selectedCategory, query]);
+
+  const urgentCount = tasks.filter((task) => (task.priority === "urgente" || task.priority === "alta") && task.status !== "concluida").length;
 
   return (
     <section>
       <div className="page-top">
         <div>
           <h1 className="page-title">Tarefas</h1>
-          <p className="page-description">
-            Crie, acompanhe, conclua e filtre suas tarefas com categoria, cor e status.
-          </p>
+          <p className="page-description">Organize suas tarefas por categoria, prioridade e status.</p>
         </div>
 
         <div className="top-actions">
-          <button className="soft-button">
-            <FileText size={18} /> PDF
+          <button className="soft-button"><FileText size={18} /> PDF</button>
+          <button className="soft-button"><FileSpreadsheet size={18} /> Excel</button>
+        </div>
+      </div>
+
+      <div className="category-top-panel">
+        <div className="category-top-header">
+          <div>
+            <h2><Layers size={20} /> Categorias rápidas</h2>
+            <p>Filtre por categoria e veja primeiro as tarefas mais urgentes.</p>
+          </div>
+          <span className="urgent-counter">{urgentCount} urgente(s)</span>
+        </div>
+
+        <div className="category-chip-list">
+          <button className={`category-filter-chip ${selectedCategory === "todas" ? "active" : ""}`} onClick={() => setSelectedCategory("todas")}>
+            <span className="category-dot" style={{ background: "#2563eb" }} />
+            Todas
+            <strong>{tasks.filter((task) => task.status !== "concluida").length}</strong>
           </button>
-          <button className="soft-button">
-            <FileSpreadsheet size={18} /> Excel
+
+          {categories.map((category) => (
+            <button key={category.id} className={`category-filter-chip ${selectedCategory === category.id ? "active" : ""}`} onClick={() => setSelectedCategory(category.id)}>
+              <span className="category-dot" style={{ background: category.color || "#2563eb" }} />
+              {category.name}
+              <strong>{categoryCount(category.id)}</strong>
+            </button>
+          ))}
+
+          <button className={`category-filter-chip ${selectedCategory === "sem_categoria" ? "active" : ""}`} onClick={() => setSelectedCategory("sem_categoria")}>
+            <Tag size={14} />
+            Sem categoria
+            <strong>{tasks.filter((task) => !task.category_id).length}</strong>
           </button>
         </div>
       </div>
@@ -205,20 +211,13 @@ function TarefasContent() {
         <div className="tasks-create-grid">
           <div className="field">
             <label>Nova tarefa</label>
-            <input
-              value={title}
-              onChange={(event) => setTitle(event.target.value)}
-              placeholder="Ex: ligar para cliente"
-            />
+            <input value={title} onChange={(event) => setTitle(event.target.value)} placeholder="Ex: ligar para cliente" />
           </div>
 
           <div className="field">
             <label>Prioridade</label>
             <select value={priority} onChange={(event) => setPriority(event.target.value)}>
-              <option value="baixa">Baixa</option>
-              <option value="media">Média</option>
-              <option value="alta">Alta</option>
-              <option value="urgente">Urgente</option>
+              {priorityOptions.map((item) => <option key={item.value} value={item.value}>{item.label}</option>)}
             </select>
           </div>
 
@@ -226,11 +225,7 @@ function TarefasContent() {
             <label>Categoria</label>
             <select value={categoryId} onChange={(event) => setCategoryId(event.target.value)}>
               <option value="">Sem categoria</option>
-              {categories.map((category) => (
-                <option key={category.id} value={category.id}>
-                  ● {category.name}
-                </option>
-              ))}
+              {categories.map((category) => <option key={category.id} value={category.id}>● {category.name}</option>)}
             </select>
           </div>
         </div>
@@ -247,21 +242,8 @@ function TarefasContent() {
           <div className="field">
             <label>Buscar</label>
             <div style={{ position: "relative" }}>
-              <Search
-                size={18}
-                style={{
-                  position: "absolute",
-                  left: 14,
-                  top: 16,
-                  color: "#64748b",
-                }}
-              />
-              <input
-                style={{ paddingLeft: 44 }}
-                value={query}
-                onChange={(event) => setQuery(event.target.value)}
-                placeholder="Buscar tarefa"
-              />
+              <Search size={18} style={{ position: "absolute", left: 14, top: 16, color: "#64748b" }} />
+              <input style={{ paddingLeft: 44 }} value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Buscar tarefa" />
             </div>
           </div>
 
@@ -269,11 +251,7 @@ function TarefasContent() {
             <label>Status</label>
             <select value={status} onChange={(event) => setStatus(event.target.value)}>
               <option value="todos">Todos os status</option>
-              {statusOptions.map((item) => (
-                <option key={item.value} value={item.value}>
-                  {item.label}
-                </option>
-              ))}
+              {statusOptions.map((item) => <option key={item.value} value={item.value}>{item.label}</option>)}
             </select>
           </div>
         </div>
@@ -282,9 +260,7 @@ function TarefasContent() {
       <div className="panel-card">
         <div className="card-header">
           <h2 className="card-title">Lista de tarefas</h2>
-          <span style={{ color: "#64748b", fontWeight: 800 }}>
-            {filtered.length} item(ns)
-          </span>
+          <span style={{ color: "#64748b", fontWeight: 800 }}>{filtered.length} item(ns)</span>
         </div>
 
         <div className="item-list">
@@ -293,20 +269,14 @@ function TarefasContent() {
           ) : (
             filtered.map((task) => {
               const category = getCategory(task.category_id);
-              const statusConfig = getStatusConfig(task.status);
+              const statusConfig = getStatus(task.status);
+              const priorityConfig = getPriority(task.priority);
 
               return (
-                <div
-                  className={`list-item task-row ${task.status === "concluida" ? "done" : ""}`}
-                  key={task.id}
-                >
+                <div className={`list-item task-row ${task.status === "concluida" ? "done" : ""}`} key={task.id}>
                   <div className="task-main">
                     <button className="task-check-button" onClick={() => toggleTask(task)}>
-                      {task.status === "concluida" ? (
-                        <RotateCcw size={18} />
-                      ) : (
-                        <Check size={18} />
-                      )}
+                      {task.status === "concluida" ? <RotateCcw size={18} /> : <Check size={18} />}
                     </button>
 
                     <div className="task-info">
@@ -315,48 +285,36 @@ function TarefasContent() {
                       <div className="task-meta">
                         {category ? (
                           <span className="task-category">
-                            <span
-                              className="category-dot"
-                              style={{ background: category.color || "#2563eb" }}
-                            />
+                            <span className="category-dot" style={{ background: category.color || "#2563eb" }} />
                             {category.name}
                           </span>
                         ) : (
-                          <span className="task-category muted">
-                            <Tag size={14} />
-                            Sem categoria
-                          </span>
+                          <span className="task-category muted"><Tag size={14} /> Sem categoria</span>
                         )}
 
-                        <span className="task-priority">
+                        <span className="task-priority" style={{ color: priorityConfig.color }}>
                           <CircleDot size={13} />
-                          {priorityLabel(task.priority)}
+                          {priorityConfig.label}
                         </span>
                       </div>
                     </div>
                   </div>
 
-                  <div className="task-actions">
-                    <select
-                      className="task-status-select"
-                      value={task.status || "pendente"}
-                      onChange={(event) => updateTaskStatus(task.id, event.target.value)}
-                      style={{
-                        borderColor: statusConfig.color,
-                        color: statusConfig.color,
-                        background: statusConfig.bg,
-                      }}
-                    >
-                      {statusOptions.map((item) => (
-                        <option key={item.value} value={item.value}>
-                          {item.label}
-                        </option>
-                      ))}
+                  <div className="task-actions task-actions-extended">
+                    <select className="task-category-select" value={task.category_id || ""} onChange={(event) => updateTask(task.id, { category_id: event.target.value || null })}>
+                      <option value="">Sem categoria</option>
+                      {categories.map((category) => <option key={category.id} value={category.id}>● {category.name}</option>)}
                     </select>
 
-                    <button className="danger-button" onClick={() => removeTask(task.id)}>
-                      <Trash2 size={18} />
-                    </button>
+                    <select className="task-priority-select" value={task.priority || "media"} onChange={(event) => updateTask(task.id, { priority: event.target.value })} style={{ borderColor: priorityConfig.color, color: priorityConfig.color }}>
+                      {priorityOptions.map((item) => <option key={item.value} value={item.value}>{item.label}</option>)}
+                    </select>
+
+                    <select className="task-status-select" value={task.status || "pendente"} onChange={(event) => updateTask(task.id, { status: event.target.value })} style={{ borderColor: statusConfig.color, color: statusConfig.color, background: statusConfig.bg }}>
+                      {statusOptions.map((item) => <option key={item.value} value={item.value}>{item.label}</option>)}
+                    </select>
+
+                    <button className="danger-button" onClick={() => removeTask(task.id)}><Trash2 size={18} /></button>
                   </div>
                 </div>
               );

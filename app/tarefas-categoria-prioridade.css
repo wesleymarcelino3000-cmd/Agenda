@@ -1,0 +1,35 @@
+.category-top-panel{margin-bottom:22px;padding:20px;border-radius:22px;background:rgba(255,255,255,.96);border:1px solid var(--border);box-shadow:var(--shadow)}
+.category-top-header{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:16px}
+.category-top-header h2{margin:0;display:flex;align-items:center;gap:10px;font-size:20px;font-weight:950;letter-spacing:-.03em}
+.category-top-header p{margin:6px 0 0;color:#64748b;font-size:14px;font-weight:700}
+.urgent-counter{min-height:36px;padding:0 14px;border-radius:999px;background:#fef2f2;color:#dc2626;font-weight:950;display:inline-flex;align-items:center;white-space:nowrap}
+.category-chip-list{display:flex;flex-wrap:wrap;gap:10px}
+.category-filter-chip{min-height:42px;border:1px solid #dbe5f2;border-radius:999px;background:#fff;color:#0f172a;padding:0 14px;display:inline-flex;align-items:center;gap:8px;font-weight:850;transition:.2s ease}
+.category-filter-chip:hover,.category-filter-chip.active{transform:translateY(-2px);border-color:#2563eb;color:#2563eb;box-shadow:0 12px 28px rgba(37,99,235,.12)}
+.category-filter-chip strong{min-width:24px;height:24px;padding:0 7px;border-radius:999px;background:#eef5ff;display:grid;place-items:center;font-size:12px}
+.tasks-create-grid{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(180px,.45fr) minmax(220px,.55fr);gap:14px}
+.tasks-filter-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(240px,.45fr);gap:14px}
+.task-message{margin-top:14px;padding:12px 14px;border-radius:14px;background:#dcfce7;color:#14532d;font-weight:850}
+.task-row{min-height:96px;padding:14px 18px;align-items:center;background:#fff!important;color:#0f172a!important}
+.task-main{min-width:0;display:flex;align-items:center;gap:14px}
+.task-check-button{width:48px;height:48px;border:0;border-radius:15px;background:#eaf2ff;color:#2563eb;display:grid;place-items:center;flex:0 0 auto;transition:.2s ease}
+.task-check-button:hover{transform:scale(1.05);background:#dbeafe}
+.task-info{min-width:0;display:flex;flex-direction:column;gap:8px}
+.task-title{color:#0f172a;font-size:16px;font-weight:900;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.task-row.done .task-title{text-decoration:line-through;opacity:.55}
+.task-meta{display:flex;flex-wrap:wrap;gap:8px}
+.task-category,.task-priority{min-height:28px;padding:0 10px;border-radius:999px;background:#f1f5f9;color:#334155;font-size:13px;font-weight:850;display:inline-flex;align-items:center;gap:7px}
+.task-category.muted{color:#64748b}
+.category-dot{width:11px;height:11px;border-radius:999px;box-shadow:0 0 0 3px rgba(15,23,42,.05)}
+.task-actions{display:flex;align-items:center;gap:10px}
+.task-actions-extended{flex-wrap:wrap;justify-content:flex-end}
+.task-status-select,.task-category-select,.task-priority-select{min-height:42px;border-radius:14px;border:1.5px solid #cbd5e1;padding:0 12px;font-weight:900;outline:none;background:#fff}
+.task-status-select{width:170px}.task-category-select{width:190px}.task-priority-select{width:130px}
+html.theme-dark .category-top-panel,html.theme-dark .task-row{background:rgba(30,41,59,.96)!important;color:#e5edf9!important;border-color:rgba(148,163,184,.25)!important}
+html.theme-dark .category-filter-chip{background:rgba(15,23,42,.75)!important;color:#e5edf9!important;border-color:rgba(148,163,184,.25)!important}
+html.theme-dark .task-title,html.theme-dark .category-top-header h2{color:#f8fafc!important}
+html.theme-dark .task-category,html.theme-dark .task-priority{background:rgba(15,23,42,.75)!important;color:#cbd5e1!important}
+html.theme-dark .task-check-button{background:rgba(37,99,235,.18);color:#60a5fa}
+html.theme-dark .task-status-select,html.theme-dark .task-category-select,html.theme-dark .task-priority-select{color:#e5edf9!important;background:rgba(15,23,42,.92)!important}
+@media(max-width:1120px){.task-row{align-items:stretch;flex-direction:column}.task-actions-extended{width:100%;justify-content:flex-start}}
+@media(max-width:960px){.tasks-create-grid,.tasks-filter-grid{grid-template-columns:1fr}.category-top-header{flex-direction:column;align-items:flex-start}.task-status-select,.task-category-select,.task-priority-select{width:100%}.task-actions{width:100%}}

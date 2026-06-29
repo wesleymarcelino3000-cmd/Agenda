@@ -1,14 +1,10 @@
-Adiciona notificações grátis do navegador/PWA para lembretes.
+Atualização da tela de tarefas:
+- alterar categoria depois da tarefa criada
+- categorias no topo como filtros rápidos
+- prioridade Urgente/Alta aparece acima da Baixa
+- prioridade editável depois de criada
 
-Funciona quando o Agenda Pro estiver aberto ou instalado como PWA.
-Para notificação com app totalmente fechado por servidor, precisa Web Push com VAPID/cron ou API externa.
-
-Substitua/adicione os arquivos no projeto e rode:
+Substitua os arquivos no projeto e rode:
 git add .
-git commit -m "Notificacoes gratis para lembretes"
+git commit -m "Tarefas com categoria editavel e prioridade ordenada"
 git push origin main
-
-Arquivos incluídos:
-- components/notifications/NotificationProvider.tsx
-- app/notifications.css
-- app/(private)/layout.tsx
